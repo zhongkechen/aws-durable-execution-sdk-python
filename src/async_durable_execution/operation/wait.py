@@ -95,7 +95,7 @@ class WaitOperationExecutor(OperationExecutor[None]):
         # Ready to suspend (checkpoint exists)
         return CheckResult.create_is_ready_to_execute(checkpointed_result)
 
-    def execute(self, _checkpointed_result: CheckpointedResult) -> None:
+    async def execute(self, _checkpointed_result: CheckpointedResult) -> None:
         """Execute wait by suspending.
 
         Wait operations 'execute' by suspending execution until the timer completes.

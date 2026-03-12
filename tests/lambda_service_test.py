@@ -46,7 +46,7 @@ from async_durable_execution.lambda_service import (
 
 @pytest.fixture
 def reset_lambda_client_cache():
-    """Reset the class-level boto3 client cache before and after each test."""
+    """Reset the class-level aioboto3 client cache before and after each test."""
     LambdaClient._cached_boto_client = None  # noqa: SLF001
     yield
     LambdaClient._cached_boto_client = None  # noqa: SLF001
@@ -1660,7 +1660,7 @@ def test_checkpoint_updated_execution_state_from_dict_with_operations():
     assert state.next_marker == "marker123"
 
 
-@patch("async_durable_execution.lambda_service.boto3")
+@patch("async_durable_execution.lambda_service.aioboto3")
 def test_lambda_client_checkpoint(mock_boto3):
     """Test LambdaClient.checkpoint method."""
     mock_client = Mock()
@@ -1814,7 +1814,7 @@ def test_lambda_client_checkpoint_with_exception():
 
 @patch("async_durable_execution.lambda_service.logger")
 def test_lambda_client_checkpoint_logs_response_metadata(mock_logger):
-    """Test LambdaClient.checkpoint logs ResponseMetadata from boto3 exception."""
+    """Test LambdaClient.checkpoint logs ResponseMetadata from aioboto3 exception."""
     mock_client = Mock()
     boto_error = Exception("API Error")
     boto_error.response = {
@@ -1850,7 +1850,7 @@ def test_lambda_client_checkpoint_logs_response_metadata(mock_logger):
 
 @patch("async_durable_execution.lambda_service.logger")
 def test_lambda_client_get_execution_state_logs_response_metadata(mock_logger):
-    """Test LambdaClient.get_execution_state logs ResponseMetadata from boto3 exception."""
+    """Test LambdaClient.get_execution_state logs ResponseMetadata from aioboto3 exception."""
     mock_client = Mock()
     boto_error = Exception("API Error")
     boto_error.response = {
@@ -1922,7 +1922,7 @@ def test_lambda_client_constructor():
 
 
 @patch.dict("os.environ", {}, clear=True)
-@patch("boto3.client")
+@patch("aioboto3.client")
 def test_lambda_client_initialize_client_default(
     mock_boto_client, reset_lambda_client_cache
 ):
@@ -1932,7 +1932,7 @@ def test_lambda_client_initialize_client_default(
 
     client = LambdaClient.initialize_client()
 
-    # Check that boto3.client was called with the right service name and config
+    # Check that aioboto3.client was called with the right service name and config
     mock_boto_client.assert_called_once()
     call_args = mock_boto_client.call_args
     assert call_args[0][0] == "lambda"
@@ -1944,18 +1944,18 @@ def test_lambda_client_initialize_client_default(
 
 
 @patch.dict("os.environ", {"AWS_ENDPOINT_URL_LAMBDA": "http://localhost:3000"})
-@patch("boto3.client")
+@patch("aioboto3.client")
 def test_lambda_client_initialize_client_with_endpoint(
     mock_boto_client, reset_lambda_client_cache
 ):
-    """Test LambdaClient.initialize_client with custom endpoint (boto3 handles it automatically)."""
+    """Test LambdaClient.initialize_client with custom endpoint (aioboto3 handles it automatically)."""
     mock_client = Mock()
     mock_boto_client.return_value = mock_client
 
     client = LambdaClient.initialize_client()
 
-    # Check that boto3.client was called with the right parameters and config
-    # Note: boto3 automatically picks up AWS_ENDPOINT_URL_LAMBDA from environment
+    # Check that aioboto3.client was called with the right parameters and config
+    # Note: aioboto3 automatically picks up AWS_ENDPOINT_URL_LAMBDA from environment
     mock_boto_client.assert_called_once()
     call_args = mock_boto_client.call_args
     assert call_args[0][0] == "lambda"
@@ -2024,7 +2024,7 @@ def test_checkpoint_error_handling():
 
 
 @patch.dict("os.environ", {}, clear=True)
-@patch("boto3.client")
+@patch("aioboto3.client")
 def test_lambda_client_initialize_client_no_endpoint(
     mock_boto_client, reset_lambda_client_cache
 ):
@@ -2070,30 +2070,30 @@ def test_lambda_client_checkpoint_with_non_none_client_token():
 # =============================================================================
 
 
-@patch("boto3.client")
+@patch("aioboto3.client")
 def test_lambda_client_cache_reuses_client(mock_boto_client, reset_lambda_client_cache):
-    """Test that initialize_client reuses the same boto3 client on subsequent calls."""
+    """Test that initialize_client reuses the same aioboto3 client on subsequent calls."""
     mock_client = Mock()
     mock_boto_client.return_value = mock_client
 
-    # First call should create the boto3 client
+    # First call should create the aioboto3 client
     client1 = LambdaClient.initialize_client()
 
-    # Second call should reuse the same boto3 client
+    # Second call should reuse the same aioboto3 client
     client2 = LambdaClient.initialize_client()
 
-    # boto3.client should only be called once
+    # aioboto3.client should only be called once
     mock_boto_client.assert_called_once()
 
-    # Both LambdaClient instances should wrap the same boto3 client
+    # Both LambdaClient instances should wrap the same aioboto3 client
     assert client1.client is client2.client
 
 
-@patch("boto3.client")
+@patch("aioboto3.client")
 def test_lambda_client_cache_creates_client_only_once(
     mock_boto_client, reset_lambda_client_cache
 ):
-    """Test that boto3.client is called only once even with multiple initialize_client calls."""
+    """Test that aioboto3.client is called only once even with multiple initialize_client calls."""
     mock_client = Mock()
     mock_boto_client.return_value = mock_client
 
@@ -2101,22 +2101,22 @@ def test_lambda_client_cache_creates_client_only_once(
     for _ in range(5):
         LambdaClient.initialize_client()
 
-    # boto3.client should only be called once
+    # aioboto3.client should only be called once
     assert mock_boto_client.call_count == 1
 
 
-@patch("boto3.client")
+@patch("aioboto3.client")
 def test_lambda_client_cache_is_class_level(
     mock_boto_client, reset_lambda_client_cache
 ):
-    """Test that the boto3 client cache is stored at class level."""
+    """Test that the aioboto3 client cache is stored at class level."""
     mock_client = Mock()
     mock_boto_client.return_value = mock_client
 
     # Create client
     LambdaClient.initialize_client()
 
-    # Verify the boto3 client is cached at class level
+    # Verify the aioboto3 client is cached at class level
     assert LambdaClient._cached_boto_client is mock_client  # noqa: SLF001
 
 

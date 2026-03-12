@@ -130,7 +130,7 @@ class OperationExecutor(ABC, Generic[T]):
         ...  # pragma: no cover
 
     @abstractmethod
-    def execute(self, checkpointed_result: CheckpointedResult) -> T:
+    async def execute(self, checkpointed_result: CheckpointedResult) -> T:
         """Execute operation logic with checkpoint data.
 
         This method is called when the operation is ready to execute its core logic.
@@ -147,7 +147,7 @@ class OperationExecutor(ABC, Generic[T]):
         """
         ...  # pragma: no cover
 
-    def process(self) -> T:
+    async def process(self) -> T:
         """Process operation with checkpoint response handling.
 
         Orchestrates the double-check pattern:
@@ -180,7 +180,7 @@ class OperationExecutor(ABC, Generic[T]):
             if result.checkpointed_result is None:
                 msg = "CheckResult is marked ready to execute but checkpointed result is not set."
                 raise InvalidStateError(msg)
-            return self.execute(result.checkpointed_result)
+            return await self.execute(result.checkpointed_result)
 
         # Invalid state - neither terminal nor ready to execute
         msg = "Invalid CheckResult state: neither terminal nor ready to execute"

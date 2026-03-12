@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import heapq
 import logging
 import threading
@@ -183,13 +184,13 @@ class ConcurrentExecutor(ABC, Generic[CallableType, ResultType]):
         self.item_serdes = item_serdes
 
     @abstractmethod
-    def execute_item(
+    async def execute_item(
         self, child_context: DurableContext, executable: Executable[CallableType]
     ) -> ResultType:
         """Execute a single executable in a child context and return the result."""
         raise NotImplementedError
 
-    def execute(
+    async def execute(
         self, execution_state: ExecutionState, executor_context: DurableContext
     ) -> BatchResult[ResultType]:
         """Execute items concurrently with event-driven state management."""
@@ -215,47 +216,32 @@ class ConcurrentExecutor(ABC, Generic[CallableType, ResultType]):
             execution_state.create_checkpoint()
             submit_task(executable_with_state)
 
-        thread_executor = ThreadPoolExecutor(max_workers=max_workers)
-        try:
-            with TimerScheduler(resubmitter) as scheduler:
+        with TimerScheduler(resubmitter) as scheduler:
+            async def submit_task(executable_with_state: ExecutableWithState) -> Future:
+                """Submit task to the thread executor and mark its state as started."""
+                future = await self._execute_item_in_child_context(
+                    executor_context,
+                    executable_with_state.executable,
+                )
+                executable_with_state.run(future)
 
-                def submit_task(executable_with_state: ExecutableWithState) -> Future:
-                    """Submit task to the thread executor and mark its state as started."""
-                    future = thread_executor.submit(
-                        self._execute_item_in_child_context,
-                        executor_context,
-                        executable_with_state.executable,
-                    )
-                    executable_with_state.run(future)
+                def on_done(future: Future) -> None:
+                    self._on_task_complete(executable_with_state, future, scheduler)
 
-                    def on_done(future: Future) -> None:
-                        self._on_task_complete(executable_with_state, future, scheduler)
+                future.add_done_callback(on_done)
+                return future
 
-                    future.add_done_callback(on_done)
-                    return future
+            # Submit initial tasks
+            futures = [
+                submit_task(exe_state) for exe_state in self.executables_with_state
+            ]
 
-                # Submit initial tasks
-                futures = [
-                    submit_task(exe_state) for exe_state in self.executables_with_state
-                ]
+            # Wait for completion
+            await asyncio.gather(*futures, return_exceptions=True)
 
-                # Wait for completion
-                self._completion_event.wait()
-
-                # Cancel futures that haven't started yet
-                for future in futures:
-                    future.cancel()
-
-                # Suspend execution if everything done and at least one of the tasks raised a suspend exception.
-                if self._suspend_exception:
-                    raise self._suspend_exception
-
-        finally:
-            # Shutdown without waiting for running threads for early return when
-            # completion criteria are met (e.g., min_successful).
-            # Running threads will continue in background but they raise OrphanedChildException
-            # on the next attempt to checkpoint.
-            thread_executor.shutdown(wait=False, cancel_futures=True)
+            # Suspend execution if everything done and at least one of the tasks raised a suspend exception.
+            if self._suspend_exception:
+                raise self._suspend_exception
 
         # Build final result
         return self._create_result()
@@ -383,7 +369,7 @@ class ConcurrentExecutor(ABC, Generic[CallableType, ResultType]):
 
         return BatchResult.from_items(batch_items, self.completion_config)
 
-    def _execute_item_in_child_context(
+    async def _execute_item_in_child_context(
         self,
         executor_context: DurableContext,
         executable: Executable[CallableType],

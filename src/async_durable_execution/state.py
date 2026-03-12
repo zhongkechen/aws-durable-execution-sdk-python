@@ -261,7 +261,7 @@ class ExecutionState:
         self._replay_status_lock: Lock = Lock()
         self._visited_operations: set[str] = set()
 
-    def fetch_paginated_operations(
+    async def fetch_paginated_operations(
         self,
         initial_operations: list[Operation],
         checkpoint_token: str,
@@ -280,7 +280,7 @@ class ExecutionState:
             initial_operations.copy() if initial_operations else []
         )
         while next_marker:
-            output: StateOutput = self._service_client.get_execution_state(
+            output: StateOutput = await self._service_client.get_execution_state(
                 durable_execution_arn=self.durable_execution_arn,
                 checkpoint_token=checkpoint_token,
                 next_marker=next_marker,
@@ -564,7 +564,7 @@ class ExecutionState:
             context_id,
         )
 
-    def checkpoint_batches_forever(self) -> None:
+    async def checkpoint_batches_forever(self) -> None:
         """Single background thread that batches operations and processes results.
 
         Runs until shutdown is signaled. This method processes checkpoint operations
@@ -605,7 +605,7 @@ class ExecutionState:
 
                 try:
                     # Make API call with batched operations
-                    output: CheckpointOutput = self._service_client.checkpoint(
+                    output: CheckpointOutput = await self._service_client.checkpoint(
                         durable_execution_arn=self.durable_execution_arn,
                         checkpoint_token=current_checkpoint_token,
                         updates=updates,
@@ -618,7 +618,7 @@ class ExecutionState:
                     current_checkpoint_token = output.checkpoint_token
 
                     # Fetch new operations from the API before unblocking sync waiters
-                    self.fetch_paginated_operations(
+                    await self.fetch_paginated_operations(
                         output.new_execution_state.operations,
                         output.checkpoint_token,
                         output.new_execution_state.next_marker,

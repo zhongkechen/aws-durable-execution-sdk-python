@@ -85,7 +85,7 @@ class MapExecutor(Generic[T, R], ConcurrentExecutor[Callable, R]):  # noqa: PYI0
             item_serdes=config.item_serdes,
         )
 
-    def execute_item(self, child_context, executable: Executable[Callable]) -> R:
+    async def execute_item(self, child_context, executable: Executable[Callable]) -> R:
         logger.debug("🗺️ Processing map item: %s", executable.index)
         item = self.items[executable.index]
         result: R = executable.func(child_context, item, executable.index, self.items)

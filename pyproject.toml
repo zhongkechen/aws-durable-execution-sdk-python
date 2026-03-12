@@ -1,44 +1,13 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "async-durable-execution"
-dynamic = ["version"]
+version = "0.1.0"
 description = 'Async Lambda Durable Execution SDK for Python'
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
 keywords = []
 dependencies = ["aioboto3"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/async_durable_execution"]
-
-[tool.hatch.version]
-path = "src/async_durable_execution/__about__.py"
-
-[tool.hatch.envs.test]
-dependencies = ["coverage[toml]", "pytest", "pytest-cov"]
-
-[tool.hatch.envs.test.scripts]
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src/async_durable_execution --cov-fail-under=98"
-
-[tool.hatch.envs.types]
-extra-dependencies = ["mypy>=1.0.0", "pytest", "boto3-stubs[lambda]"]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/async_durable_execution tests}"
-
-[tool.coverage.run]
-source_pkgs = ["async_durable_execution"]
-branch = true
-parallel = true
-omit = ["src/async_durable_execution/__about__.py"]
-
-[tool.coverage.paths]
-async_durable_execution = [
-  "src/async_durable_execution"
-]
-
-[tool.coverage.report]
-exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]

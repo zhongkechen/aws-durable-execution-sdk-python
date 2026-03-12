@@ -1825,12 +1825,12 @@ def test_durable_execution_logs_boto_client_error_extras_from_background_thread(
     mock_client = Mock(spec=DurableServiceClient)
     mock_logger = Mock()
 
-    error_obj = {"Code": "ServiceError", "Message": "Boto3 service error"}
+    error_obj = {"Code": "ServiceError", "Message": "aioboto3 service error"}
     metadata_obj = {"RequestId": "boto-request-id"}
 
     def failing_checkpoint(*args, **kwargs):
         raise BotoClientError(  # noqa TRY003
-            "Boto3 error",  # noqa EM101
+            "aioboto3 error",  # noqa EM101
             error=error_obj,
             response_metadata=metadata_obj,  # EM101
         )
@@ -1934,7 +1934,7 @@ def test_durable_execution_logs_checkpoint_error_extras_from_user_code():
 
 def test_durable_execution_with_boto3_client_parameter():
     """Test durable_execution decorator accepts boto3_client parameter."""
-    # GIVEN a custom boto3 Lambda client
+    # GIVEN a custom aioboto3 Lambda client
     mock_boto3_client = Mock()
     mock_boto3_client.checkpoint_durable_execution.return_value = {
         "CheckpointToken": "new_token",

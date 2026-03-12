@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import functools
 import hashlib
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Concatenate, Generic, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, Concatenate, Generic, ParamSpec, TypeVar, Awaitable
 
 from .config import (
     BatchedInput,
@@ -69,7 +70,6 @@ T = TypeVar("T")
 U = TypeVar("U")
 Params = ParamSpec("Params")
 
-
 logger = logging.getLogger(__name__)
 
 PASS_THROUGH_SERDES: SerDes[Any] = PassThroughSerDes()
@@ -90,7 +90,7 @@ class ExecutionContext:
 
 
 def durable_step(
-    func: Callable[Concatenate[StepContext, Params], T],
+        func: Callable[Concatenate[StepContext, Params], T],
 ) -> Callable[Params, Callable[[StepContext], T]]:
     """Wrap your callable into a named function that a Durable step can run."""
 
@@ -105,7 +105,7 @@ def durable_step(
 
 
 def durable_with_child_context(
-    func: Callable[Concatenate[DurableContext, Params], T],
+        func: Callable[Concatenate[DurableContext, Params], T],
 ) -> Callable[Params, Callable[[DurableContext], T]]:
     """Wrap your callable into a Durable child context."""
 
@@ -120,7 +120,7 @@ def durable_with_child_context(
 
 
 def durable_wait_for_callback(
-    func: Callable[Concatenate[str, WaitForCallbackContext, Params], T],
+        func: Callable[Concatenate[str, WaitForCallbackContext, Params], T],
 ) -> Callable[Params, Callable[[str, WaitForCallbackContext], T]]:
     """Wrap your callable into a wait_for_callback submitter function.
 
@@ -169,11 +169,11 @@ class Callback(Generic[T], CallbackProtocol[T]):  # noqa: PYI059
     """A future that will block on result() until callback_id returns."""
 
     def __init__(
-        self,
-        callback_id: str,
-        operation_id: str,
-        state: ExecutionState,
-        serdes: SerDes[T] | None = None,
+            self,
+            callback_id: str,
+            operation_id: str,
+            state: ExecutionState,
+            serdes: SerDes[T] | None = None,
     ):
         self.callback_id: str = callback_id
         self.operation_id: str = operation_id
@@ -200,10 +200,10 @@ class Callback(Generic[T], CallbackProtocol[T]):  # noqa: PYI059
             raise CallbackError(message=msg, callback_id=self.callback_id)
 
         if (
-            checkpointed_result.is_failed()
-            or checkpointed_result.is_cancelled()
-            or checkpointed_result.is_timed_out()
-            or checkpointed_result.is_stopped()
+                checkpointed_result.is_failed()
+                or checkpointed_result.is_cancelled()
+                or checkpointed_result.is_timed_out()
+                or checkpointed_result.is_stopped()
         ):
             msg = (
                 checkpointed_result.error.message
@@ -231,12 +231,12 @@ class Callback(Generic[T], CallbackProtocol[T]):  # noqa: PYI059
 
 class DurableContext(DurableContextProtocol):
     def __init__(
-        self,
-        state: ExecutionState,
-        execution_context: ExecutionContext,
-        lambda_context: LambdaContext | None = None,
-        parent_id: str | None = None,
-        logger: Logger | None = None,
+            self,
+            state: ExecutionState,
+            execution_context: ExecutionContext,
+            lambda_context: LambdaContext | None = None,
+            parent_id: str | None = None,
+            logger: Logger | None = None,
     ) -> None:
         self.state: ExecutionState = state
         self.execution_context: ExecutionContext = execution_context
@@ -257,8 +257,8 @@ class DurableContext(DurableContextProtocol):
     # region factories
     @staticmethod
     def from_lambda_context(
-        state: ExecutionState,
-        lambda_context: LambdaContext,
+            state: ExecutionState,
+            lambda_context: LambdaContext,
     ):
         return DurableContext(
             state=state,
@@ -325,7 +325,7 @@ class DurableContext(DurableContextProtocol):
     # region Operations
 
     def create_callback(
-        self, name: str | None = None, config: CallbackConfig | None = None
+            self, name: str | None = None, config: CallbackConfig | None = None
     ) -> Callback:
         """Create a callback.
 
@@ -362,11 +362,11 @@ class DurableContext(DurableContextProtocol):
         return result
 
     def invoke(
-        self,
-        function_name: str,
-        payload: P,
-        name: str | None = None,
-        config: InvokeConfig[P, R] | None = None,
+            self,
+            function_name: str,
+            payload: P,
+            name: str | None = None,
+            config: InvokeConfig[P, R] | None = None,
     ) -> R:
         """Invoke another Durable Function.
 
@@ -398,11 +398,11 @@ class DurableContext(DurableContextProtocol):
         return result
 
     def map(
-        self,
-        inputs: Sequence[U],
-        func: Callable[[DurableContext, U | BatchedInput[Any, U], int, Sequence[U]], T],
-        name: str | None = None,
-        config: MapConfig | None = None,
+            self,
+            inputs: Sequence[U],
+            func: Callable[[DurableContext, U | BatchedInput[Any, U], int, Sequence[U]], T],
+            name: str | None = None,
+            config: MapConfig | None = None,
     ) -> BatchResult[R]:
         """Execute a callable for each item in parallel."""
         map_name: str | None = self._resolve_step_name(name, func)
@@ -444,10 +444,10 @@ class DurableContext(DurableContextProtocol):
         return result
 
     def parallel(
-        self,
-        functions: Sequence[Callable[[DurableContext], T]],
-        name: str | None = None,
-        config: ParallelConfig | None = None,
+            self,
+            functions: Sequence[Callable[[DurableContext], T]],
+            name: str | None = None,
+            config: ParallelConfig | None = None,
     ) -> BatchResult[T]:
         """Execute multiple callables in parallel."""
         # _create_step_id() is thread-safe. rest of method is safe, since using local copy of parent id
@@ -487,10 +487,10 @@ class DurableContext(DurableContextProtocol):
         return result
 
     def run_in_child_context(
-        self,
-        func: Callable[[DurableContext], T],
-        name: str | None = None,
-        config: ChildConfig | None = None,
+            self,
+            func: Callable[[DurableContext], T],
+            name: str | None = None,
+            config: ChildConfig | None = None,
     ) -> T:
         """Run the callable and pass a child context to it.
 
@@ -523,11 +523,11 @@ class DurableContext(DurableContextProtocol):
         return result
 
     def step(
-        self,
-        func: Callable[[StepContext], T],
-        name: str | None = None,
-        config: StepConfig | None = None,
-    ) -> T:
+            self,
+            func: Callable[[StepContext], T],
+            name: str | None = None,
+            config: StepConfig | None = None,
+    ) -> Awaitable[T]:
         step_name = self._resolve_step_name(name, func)
         logger.debug("Step name: %s", step_name)
         if not config:
@@ -544,11 +544,11 @@ class DurableContext(DurableContextProtocol):
             ),
             context_logger=self.logger,
         )
-        result: T = executor.process()
+        result: Awaitable[T] = executor.process()
         self.state.track_replay(operation_id=operation_id)
         return result
 
-    def wait(self, duration: Duration, name: str | None = None) -> None:
+    def wait(self, duration: Duration, name: str | None = None) -> Awaitable[None]:
         """Wait for a specified amount of time.
 
         Args:
@@ -570,14 +570,15 @@ class DurableContext(DurableContextProtocol):
                 name=name,
             ),
         )
-        executor.process()
+        result: Awaitable[None] = executor.process()
         self.state.track_replay(operation_id=operation_id)
+        return result
 
     def wait_for_callback(
-        self,
-        submitter: Callable[[str, WaitForCallbackContext], None],
-        name: str | None = None,
-        config: WaitForCallbackConfig | None = None,
+            self,
+            submitter: Callable[[str, WaitForCallbackContext], None],
+            name: str | None = None,
+            config: WaitForCallbackConfig | None = None,
     ) -> Any:
         step_name: str | None = self._resolve_step_name(name, submitter)
         logger.debug("wait_for_callback name: %s", step_name)
@@ -591,10 +592,10 @@ class DurableContext(DurableContextProtocol):
         )
 
     def wait_for_condition(
-        self,
-        check: Callable[[T, WaitForConditionCheckContext], T],
-        config: WaitForConditionConfig[T],
-        name: str | None = None,
+            self,
+            check: Callable[[T, WaitForConditionCheckContext], T],
+            config: WaitForConditionConfig[T],
+            name: str | None = None,
     ) -> T:
         """Wait for a condition to be met by polling.
 
@@ -630,6 +631,5 @@ class DurableContext(DurableContextProtocol):
         result: T = executor.process()
         self.state.track_replay(operation_id=operation_id)
         return result
-
 
 # endregion Operations

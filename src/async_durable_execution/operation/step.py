@@ -189,7 +189,7 @@ class StepOperationExecutor(OperationExecutor[T]):
         # Ready to execute
         return CheckResult.create_is_ready_to_execute(checkpointed_result)
 
-    def execute(self, checkpointed_result: CheckpointedResult) -> T:
+    async def execute(self, checkpointed_result: CheckpointedResult) -> T:
         """Execute step function with error handling and retry logic.
 
         Args:
@@ -219,7 +219,7 @@ class StepOperationExecutor(OperationExecutor[T]):
 
         try:
             # This is the actual code provided by the caller to execute durably inside the step
-            raw_result: T = self.func(step_context)
+            raw_result: T = await self.func(step_context)
             serialized_result: str = serialize(
                 serdes=self.config.serdes,
                 value=raw_result,

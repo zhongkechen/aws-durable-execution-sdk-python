@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import functools
 import json
@@ -246,7 +247,7 @@ def durable_execution(
 
     logger.debug("Starting durable execution handler...")
 
-    def wrapper(event: Any, context: LambdaContext) -> MutableMapping[str, Any]:
+    async def async_wrapper(event: Any, context: LambdaContext) -> MutableMapping[str, Any]:
         invocation_input: DurableExecutionInvocationInput
         service_client: DurableServiceClient
 
@@ -303,7 +304,7 @@ def durable_execution(
             else ReplayStatus.NEW,
         )
 
-        execution_state.fetch_paginated_operations(
+        await execution_state.fetch_paginated_operations(
             invocation_input.initial_execution_state.operations,
             invocation_input.checkpoint_token,
             invocation_input.initial_execution_state.next_marker,
@@ -451,6 +452,10 @@ def durable_execution(
                     ).to_dict()
 
                 return result
+
+    @functools.wraps(func)
+    def wrapper(event: Any, context: LambdaContext) -> MutableMapping[str, Any]:
+        asyncio.run(async_wrapper(event, context))
 
     return wrapper
 

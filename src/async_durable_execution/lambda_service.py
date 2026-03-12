@@ -8,8 +8,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING, Any, Protocol, TypeAlias, cast
 
-import boto3
-from botocore.config import Config
+import aioboto3
+from aiobotocore.config import AioConfig
 
 from .exceptions import (
     CallableRuntimeError,
@@ -18,8 +18,8 @@ from .exceptions import (
 )
 
 if TYPE_CHECKING:
-    from mypy_boto3_lambda import LambdaClient as Boto3LambdaClient
-    from mypy_boto3_lambda.type_defs import (
+    from mypy_aioboto3_lambda import LambdaClient as aioboto3LambdaClient
+    from mypy_aioboto3_lambda.type_defs import (
         CheckpointDurableExecutionResponseTypeDef,
         GetDurableExecutionStateResponseTypeDef,
     )
@@ -1016,7 +1016,7 @@ class StateOutput:
 class DurableServiceClient(Protocol):
     """Durable Service clients must implement this interface."""
 
-    def checkpoint(
+    async def checkpoint(
         self,
         durable_execution_arn: str,
         checkpoint_token: str,
@@ -1024,7 +1024,7 @@ class DurableServiceClient(Protocol):
         client_token: str | None,
     ) -> CheckpointOutput: ...  # pragma: no cover
 
-    def get_execution_state(
+    async def get_execution_state(
         self,
         durable_execution_arn: str,
         checkpoint_token: str,
@@ -1036,9 +1036,9 @@ class DurableServiceClient(Protocol):
 class LambdaClient(DurableServiceClient):
     """Persist durable operations to the Lambda Durable Function APIs."""
 
-    _cached_boto_client: Boto3LambdaClient | None = None
+    _cached_boto_client: aioboto3LambdaClient | None = None
 
-    def __init__(self, client: Boto3LambdaClient) -> None:
+    def __init__(self, client: aioboto3LambdaClient) -> None:
         self.client = client
 
     @classmethod
@@ -1046,24 +1046,24 @@ class LambdaClient(DurableServiceClient):
         """Initialize or return cached Lambda client.
 
         Implements lazy initialization with class-level caching to optimize
-        Lambda warm starts. The boto3 client is created once and reused across
+        Lambda warm starts. The aioboto3 client is created once and reused across
         invocations, avoiding repeated credential resolution and connection
         pool setup.
 
         Returns:
-            LambdaClient: A new LambdaClient instance wrapping the cached boto3 client.
+            LambdaClient: A new LambdaClient instance wrapping the cached aioboto3 client.
         """
         if cls._cached_boto_client is None:
-            cls._cached_boto_client = boto3.client(
+            cls._cached_boto_client = aioboto3.client(
                 "lambda",
-                config=Config(
+                config=AioConfig(
                     connect_timeout=5,
                     read_timeout=50,
                 ),
             )
         return cls(client=cls._cached_boto_client)
 
-    def checkpoint(
+    async def checkpoint(
         self,
         durable_execution_arn: str,
         checkpoint_token: str,
@@ -1076,7 +1076,7 @@ class LambdaClient(DurableServiceClient):
                 optional_params["ClientToken"] = client_token
 
             result: CheckpointDurableExecutionResponseTypeDef = (
-                self.client.checkpoint_durable_execution(
+                await self.client.checkpoint_durable_execution(
                     DurableExecutionArn=durable_execution_arn,
                     CheckpointToken=checkpoint_token,
                     Updates=cast(Any, [o.to_dict() for o in updates]),
@@ -1092,7 +1092,7 @@ class LambdaClient(DurableServiceClient):
             )
             raise checkpoint_error from None
 
-    def get_execution_state(
+    async def get_execution_state(
         self,
         durable_execution_arn: str,
         checkpoint_token: str,
@@ -1101,7 +1101,7 @@ class LambdaClient(DurableServiceClient):
     ) -> StateOutput:
         try:
             result: GetDurableExecutionStateResponseTypeDef = (
-                self.client.get_durable_execution_state(
+                await self.client.get_durable_execution_state(
                     DurableExecutionArn=durable_execution_arn,
                     CheckpointToken=checkpoint_token,
                     Marker=next_marker,
