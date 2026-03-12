@@ -5,11 +5,11 @@ import time
 
 import pytest
 
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     BackgroundThreadError,
     OrderedLockError,
 )
-from aws_durable_execution_sdk_python.threading import (
+from async_durable_execution.threading import (
     CompletionEvent,
     OrderedCounter,
     OrderedLock,

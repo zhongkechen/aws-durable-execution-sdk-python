@@ -8,9 +8,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import StepConfig, StepSemantics
-from aws_durable_execution_sdk_python.context import DurableContext
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.config import StepConfig, StepSemantics
+from async_durable_execution.context import DurableContext
+from async_durable_execution.exceptions import (
     BotoClientError,
     CheckpointError,
     CheckpointErrorCategory,
@@ -18,7 +18,7 @@ from aws_durable_execution_sdk_python.exceptions import (
     InvocationError,
     SuspendExecution,
 )
-from aws_durable_execution_sdk_python.execution import (
+from async_durable_execution.execution import (
     DurableExecutionInvocationInput,
     DurableExecutionInvocationInputWithClient,
     DurableExecutionInvocationOutput,
@@ -28,7 +28,7 @@ from aws_durable_execution_sdk_python.execution import (
 )
 
 # LambdaContext no longer needed - using duck typing
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.lambda_service import (
     CallbackDetails,
     CheckpointOutput,
     CheckpointUpdatedExecutionState,
@@ -339,7 +339,7 @@ def test_durable_execution_invocation_output_from_dict_no_result():
 def test_durable_execution_client_selection_env_normal_result():
     """Test durable_execution selects correct client from environment."""
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_lambda_client:
         mock_client = Mock(spec=DurableServiceClient)
         mock_lambda_client.initialize_client.return_value = mock_client
@@ -391,7 +391,7 @@ def test_durable_execution_client_selection_env_normal_result():
 def test_durable_execution_client_selection_env_large_result():
     """Test durable_execution selects correct client from environment."""
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_lambda_client:
         mock_client = Mock(spec=DurableServiceClient)
         mock_lambda_client.initialize_client.return_value = mock_client
@@ -727,7 +727,7 @@ def test_durable_execution_execution_error_handling():
 def test_durable_execution_client_selection_default():
     """Test durable_execution selects correct client using default initialization."""
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_lambda_client:
         mock_client = Mock(spec=DurableServiceClient)
         mock_lambda_client.initialize_client.return_value = mock_client
@@ -778,7 +778,7 @@ def test_initial_execution_state_get_execution_operation_no_operations():
     """Test get_execution_operation logs debug and returns None when no operations exist."""
     state = InitialExecutionState(operations=[], next_marker="")
 
-    with patch("aws_durable_execution_sdk_python.execution.logger") as mock_logger:
+    with patch("async_durable_execution.execution.logger") as mock_logger:
         result = state.get_execution_operation()
 
         assert result is None
@@ -1117,7 +1117,7 @@ def test_durable_execution_checkpoint_execution_error_stops_background():
 
     # Mock checkpoint_batches_forever to sleep (simulates background thread running)
     with patch(
-        "aws_durable_execution_sdk_python.state.ExecutionState.checkpoint_batches_forever",
+        "async_durable_execution.state.ExecutionState.checkpoint_batches_forever",
         side_effect=slow_background,
     ):
         with pytest.raises(CheckpointError, match="Checkpoint system failed"):
@@ -1168,7 +1168,7 @@ def test_durable_execution_checkpoint_invocation_error_stops_background():
 
     # Mock checkpoint_batches_forever to sleep (simulates background thread running)
     with patch(
-        "aws_durable_execution_sdk_python.state.ExecutionState.checkpoint_batches_forever",
+        "async_durable_execution.state.ExecutionState.checkpoint_batches_forever",
         side_effect=slow_background,
     ):
         response = test_handler(invocation_input, lambda_context)
@@ -1808,7 +1808,7 @@ def test_durable_execution_logs_checkpoint_error_extras_from_background_thread()
 
     mock_client.checkpoint.side_effect = failing_checkpoint
 
-    with patch("aws_durable_execution_sdk_python.execution.logger", mock_logger):
+    with patch("async_durable_execution.execution.logger", mock_logger):
         with pytest.raises(CheckpointError):
             test_handler(invocation_input, lambda_context)
 
@@ -1866,7 +1866,7 @@ def test_durable_execution_logs_boto_client_error_extras_from_background_thread(
 
     mock_client.checkpoint.side_effect = failing_checkpoint
 
-    with patch("aws_durable_execution_sdk_python.execution.logger", mock_logger):
+    with patch("async_durable_execution.execution.logger", mock_logger):
         with pytest.raises(BotoClientError):
             test_handler(invocation_input, lambda_context)
 
@@ -1921,7 +1921,7 @@ def test_durable_execution_logs_checkpoint_error_extras_from_user_code():
     lambda_context.invoked_function_arn = None
     lambda_context.tenant_id = None
 
-    with patch("aws_durable_execution_sdk_python.execution.logger", mock_logger):
+    with patch("async_durable_execution.execution.logger", mock_logger):
         with pytest.raises(CheckpointError):
             test_handler(invocation_input, lambda_context)
 

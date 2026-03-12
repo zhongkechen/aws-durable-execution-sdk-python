@@ -6,27 +6,27 @@ from unittest.mock import Mock
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import Duration
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.config import Duration
+from async_durable_execution.exceptions import (
     CallableRuntimeError,
     InvocationError,
     SuspendExecution,
 )
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     ErrorObject,
     Operation,
     OperationStatus,
     OperationType,
     StepDetails,
 )
-from aws_durable_execution_sdk_python.logger import Logger, LogInfo
-from aws_durable_execution_sdk_python.operation.wait_for_condition import (
+from async_durable_execution.logger import Logger, LogInfo
+from async_durable_execution.operation.wait_for_condition import (
     WaitForConditionOperationExecutor,
 )
-from aws_durable_execution_sdk_python.state import CheckpointedResult, ExecutionState
-from aws_durable_execution_sdk_python.types import WaitForConditionCheckContext
-from aws_durable_execution_sdk_python.waits import (
+from async_durable_execution.state import CheckpointedResult, ExecutionState
+from async_durable_execution.types import WaitForConditionCheckContext
+from async_durable_execution.waits import (
     WaitForConditionConfig,
     WaitForConditionDecision,
 )

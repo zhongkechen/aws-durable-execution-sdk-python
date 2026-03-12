@@ -7,15 +7,15 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import Duration, InvokeConfig
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.config import Duration, InvokeConfig
+from async_durable_execution.exceptions import (
     CallableRuntimeError,
     ExecutionError,
     SuspendExecution,
     TimedSuspendExecution,
 )
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     ChainedInvokeDetails,
     ErrorObject,
     Operation,
@@ -23,9 +23,9 @@ from aws_durable_execution_sdk_python.lambda_service import (
     OperationStatus,
     OperationType,
 )
-from aws_durable_execution_sdk_python.operation.invoke import InvokeOperationExecutor
-from aws_durable_execution_sdk_python.state import CheckpointedResult, ExecutionState
-from aws_durable_execution_sdk_python.suspend import suspend_with_optional_resume_delay
+from async_durable_execution.operation.invoke import InvokeOperationExecutor
+from async_durable_execution.state import CheckpointedResult, ExecutionState
+from async_durable_execution.suspend import suspend_with_optional_resume_delay
 from tests.serdes_test import CustomDictSerDes
 
 
@@ -558,7 +558,7 @@ def test_invoke_handler_already_succeeded_with_none_payload():
 
 
 @patch(
-    "aws_durable_execution_sdk_python.operation.invoke.suspend_with_optional_resume_delay"
+    "async_durable_execution.operation.invoke.suspend_with_optional_resume_delay"
 )
 def test_invoke_handler_suspend_does_not_raise(mock_suspend):
     """Test invoke_handler when suspend_with_optional_resume_delay doesn't raise an exception."""

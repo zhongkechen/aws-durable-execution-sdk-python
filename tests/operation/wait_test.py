@@ -4,9 +4,9 @@ from unittest.mock import Mock
 
 import pytest
 
-from aws_durable_execution_sdk_python.exceptions import SuspendExecution
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.exceptions import SuspendExecution
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     Operation,
     OperationAction,
     OperationStatus,
@@ -15,8 +15,8 @@ from aws_durable_execution_sdk_python.lambda_service import (
     OperationUpdate,
     WaitOptions,
 )
-from aws_durable_execution_sdk_python.operation.wait import WaitOperationExecutor
-from aws_durable_execution_sdk_python.state import CheckpointedResult, ExecutionState
+from async_durable_execution.operation.wait import WaitOperationExecutor
+from async_durable_execution.state import CheckpointedResult, ExecutionState
 
 
 # Test helper function - maintains old handler signature for backward compatibility

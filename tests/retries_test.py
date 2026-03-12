@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import Duration
-from aws_durable_execution_sdk_python.retries import (
+from async_durable_execution.config import Duration
+from async_durable_execution.retries import (
     JitterStrategy,
     RetryDecision,
     RetryPresets,

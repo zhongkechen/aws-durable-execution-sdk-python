@@ -5,16 +5,16 @@ from unittest.mock import ANY, Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import (
+from async_durable_execution.config import (
     CallbackConfig,
     Duration,
     StepConfig,
     WaitForCallbackConfig,
 )
-from aws_durable_execution_sdk_python.context import Callback
-from aws_durable_execution_sdk_python.exceptions import CallbackError, ValidationError
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.context import Callback
+from async_durable_execution.exceptions import CallbackError, ValidationError
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     CallbackDetails,
     CallbackOptions,
     ErrorObject,
@@ -25,14 +25,14 @@ from aws_durable_execution_sdk_python.lambda_service import (
     OperationType,
     OperationUpdate,
 )
-from aws_durable_execution_sdk_python.operation.callback import (
+from async_durable_execution.operation.callback import (
     CallbackOperationExecutor,
     wait_for_callback_handler,
 )
-from aws_durable_execution_sdk_python.retries import RetryDecision
-from aws_durable_execution_sdk_python.serdes import SerDes
-from aws_durable_execution_sdk_python.state import CheckpointedResult, ExecutionState
-from aws_durable_execution_sdk_python.types import DurableContext, StepContext
+from async_durable_execution.retries import RetryDecision
+from async_durable_execution.serdes import SerDes
+from async_durable_execution.state import CheckpointedResult, ExecutionState
+from async_durable_execution.types import DurableContext, StepContext
 
 
 # Test helper - maintains old handler signature for backward compatibility in tests
@@ -1027,7 +1027,7 @@ def test_callback_name_variations():
         mock_context.reset_mock()
 
 
-@patch("aws_durable_execution_sdk_python.operation.callback.OperationUpdate")
+@patch("async_durable_execution.operation.callback.OperationUpdate")
 def test_callback_operation_update_creation(mock_operation_update):
     """Test that OperationUpdate.create_callback is called with correct parameters."""
     mock_state = Mock(spec=ExecutionState)

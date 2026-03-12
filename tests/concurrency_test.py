@@ -11,11 +11,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.concurrency.executor import (
+from async_durable_execution.concurrency.executor import (
     ConcurrentExecutor,
     TimerScheduler,
 )
-from aws_durable_execution_sdk_python.concurrency.models import (
+from async_durable_execution.concurrency.models import (
     BatchItem,
     BatchItemStatus,
     BatchResult,
@@ -25,17 +25,17 @@ from aws_durable_execution_sdk_python.concurrency.models import (
     ExecutableWithState,
     ExecutionCounters,
 )
-from aws_durable_execution_sdk_python.config import CompletionConfig, MapConfig
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.config import CompletionConfig, MapConfig
+from async_durable_execution.exceptions import (
     CallableRuntimeError,
     InvalidStateError,
     SuspendExecution,
     TimedSuspendExecution,
 )
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.lambda_service import (
     ErrorObject,
 )
-from aws_durable_execution_sdk_python.operation.map import MapExecutor
+from async_durable_execution.operation.map import MapExecutor
 
 
 def test_batch_item_status_enum():
@@ -307,7 +307,7 @@ def test_batch_result_from_dict_default_completion_reason():
     }
 
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data)
         assert result.completion_reason == CompletionReason.ALL_COMPLETED
@@ -327,7 +327,7 @@ def test_batch_result_from_dict_infer_all_completed_all_succeeded():
     }
 
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data)
         assert result.completion_reason == CompletionReason.ALL_COMPLETED
@@ -352,7 +352,7 @@ def test_batch_result_from_dict_infer_failure_tolerance_exceeded_all_failed():
 
     # With no completion config and failures, should fail-fast
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data)
         assert result.completion_reason == CompletionReason.FAILURE_TOLERANCE_EXCEEDED
@@ -378,7 +378,7 @@ def test_batch_result_from_dict_infer_all_completed_mixed_success_failure():
 
     # With no config and with failures, fail-fast
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data)
         assert result.completion_reason == CompletionReason.FAILURE_TOLERANCE_EXCEEDED
@@ -397,7 +397,7 @@ def test_batch_result_from_dict_infer_min_successful_reached_has_started():
     }
 
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data, CompletionConfig(1))
         assert result.completion_reason == CompletionReason.MIN_SUCCESSFUL_REACHED
@@ -412,7 +412,7 @@ def test_batch_result_from_dict_infer_empty_items():
     }
 
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data)
         assert result.completion_reason == CompletionReason.ALL_COMPLETED
@@ -429,7 +429,7 @@ def test_batch_result_from_dict_with_explicit_completion_reason():
     }
 
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data)
         assert result.completion_reason == CompletionReason.MIN_SUCCESSFUL_REACHED
@@ -913,7 +913,7 @@ def test_concurrent_executor_full_execution_path():
 
     # Mock ChildConfig from the config module
     with patch(
-        "aws_durable_execution_sdk_python.config.ChildConfig"
+        "async_durable_execution.config.ChildConfig"
     ) as mock_child_config:
         mock_child_config.return_value = Mock()
 
@@ -2372,7 +2372,7 @@ def test_batch_result_from_dict_with_completion_config():
     completion_config = CompletionConfig(min_successful=1)
 
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data, completion_config)
         assert result.completion_reason == CompletionReason.MIN_SUCCESSFUL_REACHED
@@ -2401,7 +2401,7 @@ def test_batch_result_from_dict_all_completed():
 
     # With no config and failures, fail-fast
     with patch(
-        "aws_durable_execution_sdk_python.concurrency.models.logger"
+        "async_durable_execution.concurrency.models.logger"
     ) as mock_logger:
         result = BatchResult.from_dict(data)
         assert result.completion_reason == CompletionReason.FAILURE_TOLERANCE_EXCEEDED
@@ -2523,7 +2523,7 @@ def test_operation_id_determinism_across_shuffles():
         executor_context.create_child_context = create_child_context
 
         with patch(
-            "aws_durable_execution_sdk_python.concurrency.executor.child_handler",
+            "async_durable_execution.concurrency.executor.child_handler",
             patched_child_handler,
         ):
             executor.execute(execution_state, executor_context)

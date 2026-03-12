@@ -13,13 +13,13 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     BackgroundThreadError,
     CallableRuntimeError,
     OrphanedChildException,
 )
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     CallbackDetails,
     ChainedInvokeDetails,
     CheckpointOutput,
@@ -35,14 +35,14 @@ from aws_durable_execution_sdk_python.lambda_service import (
     StateOutput,
     StepDetails,
 )
-from aws_durable_execution_sdk_python.state import (
+from async_durable_execution.state import (
     CheckpointBatcherConfig,
     CheckpointedResult,
     ExecutionState,
     QueuedOperation,
     ReplayStatus,
 )
-from aws_durable_execution_sdk_python.threading import CompletionEvent
+from async_durable_execution.threading import CompletionEvent
 
 
 def test_checkpointed_result_create_from_operation_step():
@@ -1912,7 +1912,7 @@ def test_collect_checkpoint_batch_time_window_expires():
         return start_time + 0.015  # 15ms elapsed, past the 10ms window
 
     with unittest.mock.patch(
-        "aws_durable_execution_sdk_python.state.time.time", side_effect=mock_time
+        "async_durable_execution.state.time.time", side_effect=mock_time
     ):
         # Collect batch - should get first operation, then break when remaining_time <= 0
         batch = state._collect_checkpoint_batch()

@@ -7,18 +7,18 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import Duration
-from aws_durable_execution_sdk_python.context import (
+from async_durable_execution.config import Duration
+from async_durable_execution.context import (
     DurableContext,
     durable_step,
     durable_wait_for_callback,
     durable_with_child_context,
 )
-from aws_durable_execution_sdk_python.execution import (
+from async_durable_execution.execution import (
     InvocationStatus,
     durable_execution,
 )
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.lambda_service import (
     CallbackDetails,
     CheckpointOutput,
     CheckpointUpdatedExecutionState,
@@ -27,11 +27,11 @@ from aws_durable_execution_sdk_python.lambda_service import (
     OperationStatus,
     OperationType,
 )
-from aws_durable_execution_sdk_python.logger import LoggerInterface
+from async_durable_execution.logger import LoggerInterface
 from tests.test_helpers import operation_id_sequence
 
 if TYPE_CHECKING:
-    from aws_durable_execution_sdk_python.types import StepContext
+    from async_durable_execution.types import StepContext
 
 
 def create_mock_checkpoint_with_operations():
@@ -110,7 +110,7 @@ def test_step_different_ways_to_pass_args():
         return results
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -196,7 +196,7 @@ def test_step_with_logger():
         assert result == "result"
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -297,7 +297,7 @@ def test_wait_inside_run_in_childcontext():
 
     # Mock the lambda client
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -389,7 +389,7 @@ def test_step_checkpoint_failure_propagates_error():
         return result
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -452,7 +452,7 @@ def test_wait_not_caught_by_exception():
             raise CustomError(msg) from err
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -521,7 +521,7 @@ def test_durable_wait_for_callback_decorator():
         context.wait_for_callback(submit_to_external_system("my_task", priority=5))
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client

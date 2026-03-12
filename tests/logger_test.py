@@ -4,14 +4,14 @@ import logging
 from collections.abc import Mapping
 from unittest.mock import Mock
 
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     Operation,
     OperationStatus,
     OperationType,
 )
-from aws_durable_execution_sdk_python.logger import Logger, LoggerInterface, LogInfo
-from aws_durable_execution_sdk_python.state import ExecutionState, ReplayStatus
+from async_durable_execution.logger import Logger, LoggerInterface, LogInfo
+from async_durable_execution.state import ExecutionState, ReplayStatus
 
 
 class PowertoolsLoggerStub:

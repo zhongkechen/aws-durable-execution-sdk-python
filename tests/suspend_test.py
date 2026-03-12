@@ -2,11 +2,11 @@ import datetime
 
 import pytest
 
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     SuspendExecution,
     TimedSuspendExecution,
 )
-from aws_durable_execution_sdk_python.suspend import (
+from async_durable_execution.suspend import (
     suspend_with_optional_resume_delay,
     suspend_with_optional_resume_timestamp,
 )

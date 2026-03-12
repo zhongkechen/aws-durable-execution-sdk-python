@@ -2,7 +2,7 @@
 
 from unittest.mock import Mock
 
-from aws_durable_execution_sdk_python.config import (
+from async_durable_execution.config import (
     BatchedInput,
     CallbackConfig,
     ChildConfig,
@@ -10,7 +10,7 @@ from aws_durable_execution_sdk_python.config import (
     ParallelConfig,
     StepConfig,
 )
-from aws_durable_execution_sdk_python.types import Callback, DurableContext
+from async_durable_execution.types import Callback, DurableContext
 
 
 def test_callback_protocol():

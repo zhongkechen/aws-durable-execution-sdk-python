@@ -8,19 +8,19 @@ from typing import Any
 
 import pytest
 
-from aws_durable_execution_sdk_python.concurrency.models import (
+from async_durable_execution.concurrency.models import (
     BatchItem,
     BatchItemStatus,
     BatchResult,
     CompletionReason,
 )
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     DurableExecutionsError,
     ExecutionError,
     SerDesError,
 )
-from aws_durable_execution_sdk_python.lambda_service import ErrorObject
-from aws_durable_execution_sdk_python.serdes import (
+from async_durable_execution.lambda_service import ErrorObject
+from async_durable_execution.serdes import (
     BytesCodec,
     ContainerCodec,
     DateTimeCodec,

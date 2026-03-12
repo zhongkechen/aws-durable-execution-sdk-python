@@ -11,14 +11,14 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import ChildConfig, Duration
-from aws_durable_execution_sdk_python.context import DurableContext, durable_step
-from aws_durable_execution_sdk_python.exceptions import InvocationError
-from aws_durable_execution_sdk_python.execution import (
+from async_durable_execution.config import ChildConfig, Duration
+from async_durable_execution.context import DurableContext, durable_step
+from async_durable_execution.exceptions import InvocationError
+from async_durable_execution.execution import (
     InvocationStatus,
     durable_execution,
 )
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.lambda_service import (
     CallbackDetails,
     CheckpointOutput,
     CheckpointUpdatedExecutionState,
@@ -28,7 +28,7 @@ from aws_durable_execution_sdk_python.lambda_service import (
 )
 
 if TYPE_CHECKING:
-    from aws_durable_execution_sdk_python.types import StepContext
+    from async_durable_execution.types import StepContext
 
 
 def create_mock_checkpoint_with_operations():
@@ -92,7 +92,7 @@ def test_end_to_end_step_operation_with_double_check():
         return result
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -155,7 +155,7 @@ def test_end_to_end_multiple_operations_execute_sequentially():
         return [context.step(step1()), context.step(step2())]
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -211,7 +211,7 @@ def test_end_to_end_wait_operation_with_double_check():
         return "completed"
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -270,7 +270,7 @@ def test_end_to_end_checkpoint_synchronization_with_operations_list():
         return context.step(my_step())
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -335,7 +335,7 @@ def test_callback_deferred_error_handling_to_result():
         return f"{callback_id}:{result}"
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -431,7 +431,7 @@ def test_end_to_end_invoke_operation_with_double_check():
         context.invoke("my-function", {"data": "test"})
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -490,7 +490,7 @@ def test_end_to_end_child_context_with_async_checkpoint():
         return result
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -557,7 +557,7 @@ def test_end_to_end_child_context_replay_children_mode():
         return f"executed_{execution_count['count']}_times"
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -656,7 +656,7 @@ def test_end_to_end_child_context_error_handling():
         return result
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client
@@ -721,7 +721,7 @@ def test_end_to_end_child_context_invocation_error_reraised():
         return result
 
     with patch(
-        "aws_durable_execution_sdk_python.execution.LambdaClient"
+        "async_durable_execution.execution.LambdaClient"
     ) as mock_client_class:
         mock_client = Mock()
         mock_client_class.initialize_client.return_value = mock_client

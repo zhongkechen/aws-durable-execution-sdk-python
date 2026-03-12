@@ -7,7 +7,7 @@ from unittest.mock import ANY, MagicMock, Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import (
+from async_durable_execution.config import (
     CallbackConfig,
     ChildConfig,
     Duration,
@@ -16,26 +16,26 @@ from aws_durable_execution_sdk_python.config import (
     ParallelConfig,
     StepConfig,
 )
-from aws_durable_execution_sdk_python.context import (
+from async_durable_execution.context import (
     Callback,
     DurableContext,
     ExecutionContext,
 )
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     CallbackError,
     SuspendExecution,
     ValidationError,
 )
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     CallbackDetails,
     ErrorObject,
     Operation,
     OperationStatus,
     OperationType,
 )
-from aws_durable_execution_sdk_python.state import CheckpointedResult, ExecutionState
-from aws_durable_execution_sdk_python.waits import (
+from async_durable_execution.state import CheckpointedResult, ExecutionState
+from async_durable_execution.waits import (
     WaitForConditionConfig,
     WaitForConditionDecision,
 )
@@ -260,7 +260,7 @@ def test_callback_result_timed_out():
 
 
 # region create_callback
-@patch("aws_durable_execution_sdk_python.context.CallbackOperationExecutor")
+@patch("async_durable_execution.context.CallbackOperationExecutor")
 def test_create_callback_basic(mock_executor_class):
     """Test create_callback with basic parameters."""
     mock_executor = MagicMock()
@@ -291,7 +291,7 @@ def test_create_callback_basic(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.CallbackOperationExecutor")
+@patch("async_durable_execution.context.CallbackOperationExecutor")
 def test_create_callback_with_name_and_config(mock_executor_class):
     """Test create_callback with name and config."""
     mock_executor = MagicMock()
@@ -323,7 +323,7 @@ def test_create_callback_with_name_and_config(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.CallbackOperationExecutor")
+@patch("async_durable_execution.context.CallbackOperationExecutor")
 def test_create_callback_with_parent_id(mock_executor_class):
     """Test create_callback with parent_id."""
 
@@ -354,7 +354,7 @@ def test_create_callback_with_parent_id(mock_executor_class):
     )
 
 
-@patch("aws_durable_execution_sdk_python.context.CallbackOperationExecutor")
+@patch("async_durable_execution.context.CallbackOperationExecutor")
 def test_create_callback_increments_counter(mock_executor_class):
     """Test create_callback increments step counter."""
     mock_executor = MagicMock()
@@ -388,7 +388,7 @@ def test_create_callback_increments_counter(mock_executor_class):
 
 
 # region step
-@patch("aws_durable_execution_sdk_python.context.StepOperationExecutor")
+@patch("async_durable_execution.context.StepOperationExecutor")
 def test_step_basic(mock_executor_class):
     """Test step with basic parameters."""
     mock_executor = MagicMock()
@@ -422,7 +422,7 @@ def test_step_basic(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.StepOperationExecutor")
+@patch("async_durable_execution.context.StepOperationExecutor")
 def test_step_with_name_and_config(mock_executor_class):
     """Test step with name and config."""
     mock_executor = MagicMock()
@@ -461,7 +461,7 @@ def test_step_with_name_and_config(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.StepOperationExecutor")
+@patch("async_durable_execution.context.StepOperationExecutor")
 def test_step_with_parent_id(mock_executor_class):
     """Test step with parent_id."""
     mock_executor = MagicMock()
@@ -498,7 +498,7 @@ def test_step_with_parent_id(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.StepOperationExecutor")
+@patch("async_durable_execution.context.StepOperationExecutor")
 def test_step_increments_counter(mock_executor_class):
     """Test step increments step counter."""
     mock_executor = MagicMock()
@@ -536,7 +536,7 @@ def test_step_increments_counter(mock_executor_class):
     ] == OperationIdentifier(expected_id2, None, None)
 
 
-@patch("aws_durable_execution_sdk_python.context.StepOperationExecutor")
+@patch("async_durable_execution.context.StepOperationExecutor")
 def test_step_with_original_name(mock_executor_class):
     """Test step with callable that has _original_name attribute."""
     mock_executor = MagicMock()
@@ -573,7 +573,7 @@ def test_step_with_original_name(mock_executor_class):
 
 
 # region invoke
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_basic(mock_executor_class):
     """Test invoke with basic parameters."""
     mock_executor = MagicMock()
@@ -604,7 +604,7 @@ def test_invoke_basic(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_with_name_and_config(mock_executor_class):
     """Test invoke with name and config."""
     mock_executor = MagicMock()
@@ -641,7 +641,7 @@ def test_invoke_with_name_and_config(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_with_parent_id(mock_executor_class):
     """Test invoke with parent_id."""
     mock_executor = MagicMock()
@@ -673,7 +673,7 @@ def test_invoke_with_parent_id(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_increments_counter(mock_executor_class):
     """Test invoke increments step counter."""
     mock_executor = MagicMock()
@@ -706,7 +706,7 @@ def test_invoke_increments_counter(mock_executor_class):
     ] == OperationIdentifier(expected_id2, None, None)
 
 
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_with_none_payload(mock_executor_class):
     """Test invoke with None payload."""
     mock_executor = MagicMock()
@@ -738,7 +738,7 @@ def test_invoke_with_none_payload(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_with_custom_serdes(mock_executor_class):
     """Test invoke with custom serialization config."""
     mock_executor = MagicMock()
@@ -788,7 +788,7 @@ def test_invoke_with_custom_serdes(mock_executor_class):
 
 
 # region wait
-@patch("aws_durable_execution_sdk_python.context.WaitOperationExecutor")
+@patch("async_durable_execution.context.WaitOperationExecutor")
 def test_wait_basic(mock_executor_class):
     """Test wait with basic parameters."""
     mock_executor = MagicMock()
@@ -814,7 +814,7 @@ def test_wait_basic(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.WaitOperationExecutor")
+@patch("async_durable_execution.context.WaitOperationExecutor")
 def test_wait_with_name(mock_executor_class):
     """Test wait with name parameter."""
     mock_executor = MagicMock()
@@ -843,7 +843,7 @@ def test_wait_with_name(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.WaitOperationExecutor")
+@patch("async_durable_execution.context.WaitOperationExecutor")
 def test_wait_with_parent_id(mock_executor_class):
     """Test wait with parent_id."""
     mock_executor = MagicMock()
@@ -872,7 +872,7 @@ def test_wait_with_parent_id(mock_executor_class):
     mock_executor.process.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.WaitOperationExecutor")
+@patch("async_durable_execution.context.WaitOperationExecutor")
 def test_wait_increments_counter(mock_executor_class):
     """Test wait increments step counter."""
     mock_executor = MagicMock()
@@ -904,7 +904,7 @@ def test_wait_increments_counter(mock_executor_class):
     ] == OperationIdentifier(expected_id2, None, None)
 
 
-@patch("aws_durable_execution_sdk_python.context.WaitOperationExecutor")
+@patch("async_durable_execution.context.WaitOperationExecutor")
 def test_wait_returns_none(mock_executor_class):
     """Test wait returns None."""
     mock_executor = MagicMock()
@@ -923,7 +923,7 @@ def test_wait_returns_none(mock_executor_class):
     assert result is None
 
 
-@patch("aws_durable_execution_sdk_python.context.WaitOperationExecutor")
+@patch("async_durable_execution.context.WaitOperationExecutor")
 def test_wait_with_time_less_than_one(mock_executor_class):
     """Test wait with time less than one."""
     mock_executor = MagicMock()
@@ -945,7 +945,7 @@ def test_wait_with_time_less_than_one(mock_executor_class):
 
 
 # region run_in_child_context
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_run_in_child_context_basic(mock_handler):
     """Test run_in_child_context with basic parameters."""
     mock_handler.return_value = "child_result"
@@ -976,7 +976,7 @@ def test_run_in_child_context_basic(mock_handler):
     assert call_args[1]["config"] is None
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_run_in_child_context_with_name_and_config(mock_handler):
     """Test run_in_child_context with name and config."""
     mock_handler.return_value = "configured_child_result"
@@ -1006,7 +1006,7 @@ def test_run_in_child_context_with_name_and_config(mock_handler):
     assert call_args[1]["config"] is config
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_run_in_child_context_with_parent_id(mock_executor_class):
     """Test run_in_child_context with parent_id."""
     mock_executor = MagicMock()
@@ -1038,7 +1038,7 @@ def test_run_in_child_context_with_parent_id(mock_executor_class):
     )
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_run_in_child_context_creates_child_context(mock_executor_class):
     """Test run_in_child_context creates proper child context."""
     mock_state = Mock(spec=ExecutionState)
@@ -1067,7 +1067,7 @@ def test_run_in_child_context_creates_child_context(mock_executor_class):
     mock_callable.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_run_in_child_context_increments_counter(mock_executor_class):
     """Test run_in_child_context increments step counter."""
     mock_executor = MagicMock()
@@ -1104,7 +1104,7 @@ def test_run_in_child_context_increments_counter(mock_executor_class):
     ] == OperationIdentifier(expected_id2, None, None)
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_run_in_child_context_resolves_name_from_callable(mock_executor_class):
     """Test run_in_child_context resolves name from callable._original_name."""
     mock_executor = MagicMock()
@@ -1131,7 +1131,7 @@ def test_run_in_child_context_resolves_name_from_callable(mock_executor_class):
 
 
 # region wait_for_callback
-@patch("aws_durable_execution_sdk_python.context.wait_for_callback_handler")
+@patch("async_durable_execution.context.wait_for_callback_handler")
 def test_wait_for_callback_basic(mock_executor_class):
     """Test wait_for_callback with basic parameters."""
     mock_executor = MagicMock()
@@ -1162,7 +1162,7 @@ def test_wait_for_callback_basic(mock_executor_class):
         assert call_args[0][1] is None  # name should be None
 
 
-@patch("aws_durable_execution_sdk_python.context.wait_for_callback_handler")
+@patch("async_durable_execution.context.wait_for_callback_handler")
 def test_wait_for_callback_with_name_and_config(mock_executor_class):
     """Test wait_for_callback with name and config."""
     mock_executor = MagicMock()
@@ -1191,7 +1191,7 @@ def test_wait_for_callback_with_name_and_config(mock_executor_class):
         )  # name should be from _original_name
 
 
-@patch("aws_durable_execution_sdk_python.context.wait_for_callback_handler")
+@patch("async_durable_execution.context.wait_for_callback_handler")
 def test_wait_for_callback_resolves_name_from_submitter(mock_executor_class):
     """Test wait_for_callback resolves name from submitter._original_name."""
     mock_executor = MagicMock()
@@ -1216,7 +1216,7 @@ def test_wait_for_callback_resolves_name_from_submitter(mock_executor_class):
         assert call_args[0][1] == "submit_task"
 
 
-@patch("aws_durable_execution_sdk_python.context.wait_for_callback_handler")
+@patch("async_durable_execution.context.wait_for_callback_handler")
 def test_wait_for_callback_passes_child_context(mock_executor_class):
     """Test wait_for_callback passes child context to handler."""
     mock_state = Mock(spec=ExecutionState)
@@ -1252,7 +1252,7 @@ def test_wait_for_callback_passes_child_context(mock_executor_class):
 
 
 # region map
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_map_basic(mock_handler):
     """Test map with basic parameters."""
     mock_handler.return_value = "map_result"
@@ -1278,7 +1278,7 @@ def test_map_basic(mock_handler):
     assert call_args[1]["config"].sub_type.value == "Map"
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_map_with_name_and_config(mock_handler):
     """Test map with name and config."""
     mock_handler.return_value = "configured_map_result"
@@ -1306,7 +1306,7 @@ def test_map_with_name_and_config(mock_handler):
     )  # name should be custom_map
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_map_calls_handler_correctly(mock_handler):
     """Test map calls map_handler with correct parameters."""
     mock_handler.return_value = "handler_result"
@@ -1328,7 +1328,7 @@ def test_map_calls_handler_correctly(mock_handler):
     mock_handler.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.map_handler")
+@patch("async_durable_execution.context.map_handler")
 def test_map_with_empty_inputs(mock_handler):
     """Test map with empty inputs."""
     mock_handler.return_value = "empty_map_result"
@@ -1351,7 +1351,7 @@ def test_map_with_empty_inputs(mock_handler):
         assert result == "empty_map_result"
 
 
-@patch("aws_durable_execution_sdk_python.context.map_handler")
+@patch("async_durable_execution.context.map_handler")
 def test_map_with_different_input_types(mock_handler):
     """Test map with different input types."""
     mock_handler.return_value = "mixed_map_result"
@@ -1378,7 +1378,7 @@ def test_map_with_different_input_types(mock_handler):
 
 
 # region parallel
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_parallel_basic(mock_handler):
     """Test parallel with basic parameters."""
     mock_handler.return_value = "parallel_result"
@@ -1407,7 +1407,7 @@ def test_parallel_basic(mock_handler):
     assert call_args[1]["config"].sub_type.value == "Parallel"
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_parallel_with_name_and_config(mock_handler):
     """Test parallel with name and config."""
     mock_handler.return_value = "configured_parallel_result"
@@ -1436,7 +1436,7 @@ def test_parallel_with_name_and_config(mock_handler):
     )  # name should be custom_parallel
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_parallel_resolves_name_from_callable(mock_handler):
     """Test parallel resolves name from callable._original_name."""
     mock_handler.return_value = "named_parallel_result"
@@ -1471,7 +1471,7 @@ def test_parallel_resolves_name_from_callable(mock_handler):
     )  # name should be None since callables don't have _original_name
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_parallel_calls_handler_correctly(mock_handler):
     """Test parallel calls parallel_handler with correct parameters."""
     mock_handler.return_value = "handler_result"
@@ -1496,7 +1496,7 @@ def test_parallel_calls_handler_correctly(mock_handler):
     mock_handler.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.parallel_handler")
+@patch("async_durable_execution.context.parallel_handler")
 def test_parallel_with_empty_callables(mock_handler):
     """Test parallel with empty callables."""
     mock_handler.return_value = "empty_parallel_result"
@@ -1516,7 +1516,7 @@ def test_parallel_with_empty_callables(mock_handler):
         assert result == "empty_parallel_result"
 
 
-@patch("aws_durable_execution_sdk_python.context.parallel_handler")
+@patch("async_durable_execution.context.parallel_handler")
 def test_parallel_with_single_callable(mock_handler):
     """Test parallel with single callable."""
     mock_handler.return_value = "single_parallel_result"
@@ -1539,7 +1539,7 @@ def test_parallel_with_single_callable(mock_handler):
         assert result == "single_parallel_result"
 
 
-@patch("aws_durable_execution_sdk_python.context.parallel_handler")
+@patch("async_durable_execution.context.parallel_handler")
 def test_parallel_with_many_callables(mock_handler):
     """Test parallel with many callables."""
     mock_handler.return_value = "many_parallel_result"
@@ -1569,7 +1569,7 @@ def test_parallel_with_many_callables(mock_handler):
 
 
 # region map
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_map_calls_handler(mock_handler):
     """Test map calls map_handler through run_in_child_context."""
     mock_handler.return_value = "map_result"
@@ -1592,7 +1592,7 @@ def test_map_calls_handler(mock_handler):
     mock_handler.assert_called_once()
 
 
-@patch("aws_durable_execution_sdk_python.context.child_handler")
+@patch("async_durable_execution.context.child_handler")
 def test_parallel_calls_handler(mock_handler):
     """Test parallel calls parallel_handler through run_in_child_context."""
     mock_handler.return_value = "parallel_result"
@@ -1666,7 +1666,7 @@ def test_context_map_handler_call():
 
     # Mock the handlers to track calls
     with patch(
-        "aws_durable_execution_sdk_python.context.map_handler"
+        "async_durable_execution.context.map_handler"
     ) as mock_map_handler:
         mock_map_handler.return_value = Mock()
 
@@ -1706,7 +1706,7 @@ def test_context_parallel_handler_call():
 
     # Mock the handlers to track calls
     with patch(
-        "aws_durable_execution_sdk_python.context.parallel_handler"
+        "async_durable_execution.context.parallel_handler"
     ) as mock_parallel_handler:
         mock_parallel_handler.return_value = Mock()
 
@@ -1750,7 +1750,7 @@ def test_context_wait_for_condition_handler_call():
 
     # Mock the executor to track calls
     with patch(
-        "aws_durable_execution_sdk_python.context.WaitForConditionOperationExecutor"
+        "async_durable_execution.context.WaitForConditionOperationExecutor"
     ) as mock_executor_class:
         mock_executor = MagicMock()
         mock_executor.process.return_value = "final_state"
@@ -1828,7 +1828,7 @@ def test_operation_id_generation_unique():
         assert ids[i] != ids[i + 1]
 
 
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_with_explicit_tenant_id(mock_executor_class):
     """Test invoke with explicit tenant_id in config."""
     mock_executor = MagicMock()
@@ -1851,7 +1851,7 @@ def test_invoke_with_explicit_tenant_id(mock_executor_class):
     assert call_args["config"].tenant_id == "explicit-tenant"
 
 
-@patch("aws_durable_execution_sdk_python.context.InvokeOperationExecutor")
+@patch("async_durable_execution.context.InvokeOperationExecutor")
 def test_invoke_without_tenant_id_defaults_to_none(mock_executor_class):
     """Test invoke without tenant_id defaults to None."""
     mock_executor = MagicMock()

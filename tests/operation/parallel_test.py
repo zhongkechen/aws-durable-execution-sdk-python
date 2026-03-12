@@ -6,27 +6,27 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.concurrency.executor import ConcurrentExecutor
+from async_durable_execution.concurrency.executor import ConcurrentExecutor
 
 # Mock the executor.execute method to return a BatchResult
-from aws_durable_execution_sdk_python.concurrency.models import (
+from async_durable_execution.concurrency.models import (
     BatchItem,
     BatchItemStatus,
     BatchResult,
     CompletionReason,
     Executable,
 )
-from aws_durable_execution_sdk_python.config import CompletionConfig, ParallelConfig
-from aws_durable_execution_sdk_python.context import DurableContext, ExecutionContext
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import OperationSubType
-from aws_durable_execution_sdk_python.operation import child
-from aws_durable_execution_sdk_python.operation.parallel import (
+from async_durable_execution.config import CompletionConfig, ParallelConfig
+from async_durable_execution.context import DurableContext, ExecutionContext
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import OperationSubType
+from async_durable_execution.operation import child
+from async_durable_execution.operation.parallel import (
     ParallelExecutor,
     parallel_handler,
 )
-from aws_durable_execution_sdk_python.serdes import serialize
-from aws_durable_execution_sdk_python.state import ExecutionState
+from async_durable_execution.serdes import serialize
+from async_durable_execution.state import ExecutionState
 from tests.serdes_test import CustomStrSerDes
 
 
@@ -727,10 +727,10 @@ def test_parallel_handler_first_execution_then_replay():
 
     with (
         patch(
-            "aws_durable_execution_sdk_python.operation.parallel.ParallelExecutor.execute"
+            "async_durable_execution.operation.parallel.ParallelExecutor.execute"
         ) as mock_execute,
         patch(
-            "aws_durable_execution_sdk_python.operation.parallel.ParallelExecutor.replay"
+            "async_durable_execution.operation.parallel.ParallelExecutor.replay"
         ) as mock_replay,
     ):
         mock_execute.return_value = Mock()  # Mock BatchResult
@@ -769,7 +769,7 @@ def test_parallel_handler_first_execution_then_replay():
         (Mock(), None),
     ],
 )
-@patch("aws_durable_execution_sdk_python.operation.child.serialize")
+@patch("async_durable_execution.operation.child.serialize")
 def test_parallel_item_serialize(mock_serialize, item_serdes, batch_serdes):
     """Test parallel serializes branches with item_serdes or fallback."""
     mock_serialize.return_value = '"serialized"'
@@ -833,7 +833,7 @@ def test_parallel_item_serialize(mock_serialize, item_serdes, batch_serdes):
         (Mock(), None),
     ],
 )
-@patch("aws_durable_execution_sdk_python.operation.child.deserialize")
+@patch("async_durable_execution.operation.child.deserialize")
 def test_parallel_item_deserialize(mock_deserialize, item_serdes, batch_serdes):
     """Test parallel deserializes branches with item_serdes or fallback."""
     mock_deserialize.return_value = "deserialized"
@@ -942,7 +942,7 @@ def test_parallel_handler_serializes_batch_result():
     """Verify parallel_handler serializes BatchResult at parent level."""
 
     with patch(
-        "aws_durable_execution_sdk_python.serdes.serialize"
+        "async_durable_execution.serdes.serialize"
     ) as mock_serdes_serialize:
         mock_serdes_serialize.return_value = '"serialized"'
         importlib.reload(child)
@@ -994,7 +994,7 @@ def test_parallel_handler_serializes_batch_result():
 def test_parallel_default_serdes_serializes_batch_result():
     """Verify default serdes automatically serializes BatchResult."""
     with patch(
-        "aws_durable_execution_sdk_python.serdes.serialize", wraps=serialize
+        "async_durable_execution.serdes.serialize", wraps=serialize
     ) as mock_serialize:
         importlib.reload(child)
 
@@ -1050,7 +1050,7 @@ def test_parallel_custom_serdes_serializes_batch_result():
 
     custom_serdes = CustomStrSerDes()
 
-    with patch("aws_durable_execution_sdk_python.serdes.serialize") as mock_serialize:
+    with patch("async_durable_execution.serdes.serialize") as mock_serialize:
         mock_serialize.return_value = '"serialized"'
         importlib.reload(child)
 

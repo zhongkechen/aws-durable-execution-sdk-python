@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from botocore.exceptions import ClientError  # type: ignore[import-untyped]
 
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     CallableRuntimeError,
     CallableRuntimeErrorSerializableDetails,
     CheckpointError,

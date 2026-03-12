@@ -6,19 +6,19 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import (
+from async_durable_execution.config import (
     Duration,
     StepConfig,
     StepSemantics,
 )
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     CallableRuntimeError,
     ExecutionError,
     StepInterruptedError,
     SuspendExecution,
 )
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     ErrorObject,
     Operation,
     OperationAction,
@@ -27,10 +27,10 @@ from aws_durable_execution_sdk_python.lambda_service import (
     OperationType,
     StepDetails,
 )
-from aws_durable_execution_sdk_python.logger import Logger
-from aws_durable_execution_sdk_python.operation.step import StepOperationExecutor
-from aws_durable_execution_sdk_python.retries import RetryDecision
-from aws_durable_execution_sdk_python.state import CheckpointedResult, ExecutionState
+from async_durable_execution.logger import Logger
+from async_durable_execution.operation.step import StepOperationExecutor
+from async_durable_execution.retries import RetryDecision
+from async_durable_execution.state import CheckpointedResult, ExecutionState
 from tests.serdes_test import CustomDictSerDes
 
 
@@ -497,7 +497,7 @@ def test_step_handler_pending_without_existing_attempts():
 
 
 @patch(
-    "aws_durable_execution_sdk_python.operation.step.StepOperationExecutor.retry_handler"
+    "async_durable_execution.operation.step.StepOperationExecutor.retry_handler"
 )
 def test_step_handler_retry_handler_no_exception(mock_retry_handler):
     """Test step_handler when retry_handler doesn't raise an exception."""

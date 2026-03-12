@@ -2,8 +2,8 @@
 
 from unittest.mock import Mock
 
-from aws_durable_execution_sdk_python.context import DurableContext, ExecutionContext
-from aws_durable_execution_sdk_python.execution import ExecutionState
+from async_durable_execution.context import DurableContext, ExecutionContext
+from async_durable_execution.execution import ExecutionState
 
 
 def operation_id_sequence(parent_id: str | None = None):

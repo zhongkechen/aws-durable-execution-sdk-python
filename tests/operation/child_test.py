@@ -8,21 +8,21 @@ from unittest.mock import Mock
 
 import pytest
 
-from aws_durable_execution_sdk_python.config import ChildConfig
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.config import ChildConfig
+from async_durable_execution.exceptions import (
     CallableRuntimeError,
     InvocationError,
 )
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     ErrorObject,
     OperationAction,
     OperationSubType,
     OperationType,
 )
-from aws_durable_execution_sdk_python.operation.child import child_handler
-from aws_durable_execution_sdk_python.state import ExecutionState
-from aws_durable_execution_sdk_python.types import SummaryGenerator
+from async_durable_execution.operation.child import child_handler
+from async_durable_execution.state import ExecutionState
+from async_durable_execution.types import SummaryGenerator
 from tests.serdes_test import CustomDictSerDes
 
 

@@ -2,9 +2,9 @@
 
 from unittest.mock import patch
 
-from aws_durable_execution_sdk_python.config import Duration, JitterStrategy
-from aws_durable_execution_sdk_python.serdes import JsonSerDes
-from aws_durable_execution_sdk_python.waits import (
+from async_durable_execution.config import Duration, JitterStrategy
+from async_durable_execution.serdes import JsonSerDes
+from async_durable_execution.waits import (
     WaitDecision,
     WaitForConditionConfig,
     WaitForConditionDecision,

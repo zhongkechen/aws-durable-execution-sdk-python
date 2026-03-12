@@ -7,25 +7,25 @@ from unittest.mock import Mock, patch
 import pytest
 
 # Mock the executor.execute method
-from aws_durable_execution_sdk_python.concurrency.models import (
+from async_durable_execution.concurrency.models import (
     BatchItem,
     BatchItemStatus,
     BatchResult,
     CompletionReason,
     Executable,
 )
-from aws_durable_execution_sdk_python.config import (
+from async_durable_execution.config import (
     CompletionConfig,
     ItemBatcher,
     MapConfig,
 )
-from aws_durable_execution_sdk_python.context import DurableContext, ExecutionContext
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import OperationSubType
-from aws_durable_execution_sdk_python.operation import child  # PLC0415
-from aws_durable_execution_sdk_python.operation.map import MapExecutor, map_handler
-from aws_durable_execution_sdk_python.serdes import serialize
-from aws_durable_execution_sdk_python.state import ExecutionState
+from async_durable_execution.context import DurableContext, ExecutionContext
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import OperationSubType
+from async_durable_execution.operation import child  # PLC0415
+from async_durable_execution.operation.map import MapExecutor, map_handler
+from async_durable_execution.serdes import serialize
+from async_durable_execution.state import ExecutionState
 from tests.serdes_test import CustomStrSerDes
 
 
@@ -97,7 +97,7 @@ def test_map_executor_from_items_default_config():
     assert executor.items == items
 
 
-@patch("aws_durable_execution_sdk_python.operation.map.logger")
+@patch("async_durable_execution.operation.map.logger")
 def test_map_executor_execute_item(mock_logger):
     """Test MapExecutor.execute_item method with logging."""
     items = ["hello", "world"]
@@ -744,10 +744,10 @@ def test_map_handler_first_execution_then_replay_integration():
 
     with (
         patch(
-            "aws_durable_execution_sdk_python.operation.map.MapExecutor.execute"
+            "async_durable_execution.operation.map.MapExecutor.execute"
         ) as mock_execute,
         patch(
-            "aws_durable_execution_sdk_python.operation.map.MapExecutor.replay"
+            "async_durable_execution.operation.map.MapExecutor.replay"
         ) as mock_replay,
     ):
         mock_execute.return_value = Mock()  # Mock BatchResult
@@ -786,7 +786,7 @@ def test_map_handler_first_execution_then_replay_integration():
         (Mock(), None),
     ],
 )
-@patch("aws_durable_execution_sdk_python.operation.child.serialize")
+@patch("async_durable_execution.operation.child.serialize")
 def test_map_item_serialize(mock_serialize, item_serdes, batch_serdes):
     """Test map serializes items with item_serdes or fallback."""
     mock_serialize.return_value = '"serialized"'
@@ -851,7 +851,7 @@ def test_map_item_serialize(mock_serialize, item_serdes, batch_serdes):
         (Mock(), None),
     ],
 )
-@patch("aws_durable_execution_sdk_python.operation.child.deserialize")
+@patch("async_durable_execution.operation.child.deserialize")
 def test_map_item_deserialize(mock_deserialize, item_serdes, batch_serdes):
     """Test map deserializes items with item_serdes or fallback."""
     mock_deserialize.return_value = "deserialized"
@@ -948,7 +948,7 @@ def test_map_result_serialization_roundtrip():
 def test_map_handler_serializes_batch_result():
     """Verify map_handler serializes BatchResult at parent level."""
     with patch(
-        "aws_durable_execution_sdk_python.serdes.serialize"
+        "async_durable_execution.serdes.serialize"
     ) as mock_serdes_serialize:
         mock_serdes_serialize.return_value = '"serialized"'
         importlib.reload(child)
@@ -1001,7 +1001,7 @@ def test_map_default_serdes_serializes_batch_result():
     """Verify default serdes automatically serializes BatchResult."""
 
     with patch(
-        "aws_durable_execution_sdk_python.serdes.serialize", wraps=serialize
+        "async_durable_execution.serdes.serialize", wraps=serialize
     ) as mock_serialize:
         importlib.reload(child)
 
@@ -1057,7 +1057,7 @@ def test_map_custom_serdes_serializes_batch_result():
 
     custom_serdes = CustomStrSerDes()
 
-    with patch("aws_durable_execution_sdk_python.serdes.serialize") as mock_serialize:
+    with patch("async_durable_execution.serdes.serialize") as mock_serialize:
         mock_serialize.return_value = '"serialized"'
         importlib.reload(child)
 

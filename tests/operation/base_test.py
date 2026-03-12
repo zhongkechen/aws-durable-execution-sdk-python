@@ -4,17 +4,17 @@ from __future__ import annotations
 
 import pytest
 
-from aws_durable_execution_sdk_python.exceptions import InvalidStateError
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.exceptions import InvalidStateError
+from async_durable_execution.lambda_service import (
     Operation,
     OperationStatus,
     OperationType,
 )
-from aws_durable_execution_sdk_python.operation.base import (
+from async_durable_execution.operation.base import (
     CheckResult,
     OperationExecutor,
 )
-from aws_durable_execution_sdk_python.state import CheckpointedResult
+from async_durable_execution.state import CheckpointedResult
 
 # Test fixtures and helpers
 

@@ -6,13 +6,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from aws_durable_execution_sdk_python.exceptions import (
+from async_durable_execution.exceptions import (
     CallableRuntimeError,
     CheckpointError,
     GetExecutionStateError,
 )
-from aws_durable_execution_sdk_python.identifier import OperationIdentifier
-from aws_durable_execution_sdk_python.lambda_service import (
+from async_durable_execution.identifier import OperationIdentifier
+from async_durable_execution.lambda_service import (
     CallbackDetails,
     CallbackOptions,
     ChainedInvokeDetails,
@@ -708,7 +708,7 @@ def test_operation_update_create_wait_start():
     assert update.sub_type is OperationSubType.WAIT
 
 
-@patch("aws_durable_execution_sdk_python.lambda_service.datetime")
+@patch("async_durable_execution.lambda_service.datetime")
 def test_operation_update_create_execution_succeed(mock_datetime):
     """Test OperationUpdate.create_execution_succeed factory method."""
 
@@ -1660,7 +1660,7 @@ def test_checkpoint_updated_execution_state_from_dict_with_operations():
     assert state.next_marker == "marker123"
 
 
-@patch("aws_durable_execution_sdk_python.lambda_service.boto3")
+@patch("async_durable_execution.lambda_service.boto3")
 def test_lambda_client_checkpoint(mock_boto3):
     """Test LambdaClient.checkpoint method."""
     mock_client = Mock()
@@ -1812,7 +1812,7 @@ def test_lambda_client_checkpoint_with_exception():
         lambda_client.checkpoint("arn123", "token123", [update], None)
 
 
-@patch("aws_durable_execution_sdk_python.lambda_service.logger")
+@patch("async_durable_execution.lambda_service.logger")
 def test_lambda_client_checkpoint_logs_response_metadata(mock_logger):
     """Test LambdaClient.checkpoint logs ResponseMetadata from boto3 exception."""
     mock_client = Mock()
@@ -1848,7 +1848,7 @@ def test_lambda_client_checkpoint_logs_response_metadata(mock_logger):
     )
 
 
-@patch("aws_durable_execution_sdk_python.lambda_service.logger")
+@patch("async_durable_execution.lambda_service.logger")
 def test_lambda_client_get_execution_state_logs_response_metadata(mock_logger):
     """Test LambdaClient.get_execution_state logs ResponseMetadata from boto3 exception."""
     mock_client = Mock()
@@ -2000,7 +2000,7 @@ def test_durable_service_client_protocol_get_execution_state():
 
 
 @patch.dict("os.environ", {}, clear=True)
-@patch("aws_durable_execution_sdk_python.lambda_service.LambdaClient.initialize_client")
+@patch("async_durable_execution.lambda_service.LambdaClient.initialize_client")
 def test_lambda_client_initialize_client_defaults(mock_init):
     """Test LambdaClient.initialize_client with default environment values."""
     LambdaClient.initialize_client()
